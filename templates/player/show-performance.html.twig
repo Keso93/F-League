@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Performances{% endblock %}
+
+{% block body %}
+    {% if performances %}
+        <table id="performance" class="table table-striped">
+            <thead>
+            <tr>
+                <th>Utakmica</th>
+                <th>Igrac</th>
+                <th>Ocena</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for performance in performances %}
+                <tr class="row_{{ performance.id }}">
+                    <td>{{ performance.game.homeClub.name }} vs {{ performance.game.guestClub.name }}</td>
+                    <td>{{ performance.player.name }} {{ performance.player.surname }}</td>
+                    <td>{{ performance.playerRating }}</td>
+                    <td>
+                        <a href="{{ path('edit_performance', {id:performance.id}) }}" class="btn btn-light">Edit</a>
+                        <button class="btn waves-effect waves-light red delete_js" type="button" data-id="{{ performance.id }}">Delete</button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <br>
+        <div class="logout">
+            <a class="btn-floating btn-large waves-effect waves-light red" href="{{path('addperformance')}}"><i class="material-icons">add</i></a>
+            <a class="btn waves-effect waves-light red" href="{{path('app_logout')}}">Log out</a>
+        </div>
+
+    {% else %}
+        <p>No performances to display</p>
+        <a class="btn-floating btn-large waves-effect waves-light red" href="{{path('addperformance')}}"><i class="material-icons">add</i></a>
+    {% endif %}
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+
+        $( document ).ajaxError(function( event, jqxhr, settings, thrownError ) {
+            if(settings.url === '/json/performance/delete'){
+                M.toast({html: jqxhr.responseText})
+            }
+        });
+
+        $(".delete_js").click(function () {
+            var id = $(this).data('id');
+            var data = {
+                id: id,
+            };
+            var sFunction = function (response) {
+
+                if(response){ // check whether response is received
+                    console.log(response);
+                    if (response.code == 200){
+                        $('.row_' + id).remove();
+                        M.toast({html: 'Uspjesno ste obrisali nastup', classes: 'green darken-3'})
+
+                    }
+                }
+
+            };
+            adapter.delete("{{ path('json_delete_performance') }}", data, sFunction);
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Location{% endblock %}
+
+{% block body %}
+    <h1>Edit Location</h1>
+{#    <form action="/location/update/{{ location.id }}" method="post">#}
+{#        Location: <input name="name" type="text" value="{{ location.name }}">#}
+{#        PTT: <input name="ptt" type="text" value="{{ location.ptt }}">#}
+{#        <input type="submit">#}
+{#    </form>#}
+
+
+        <div class="row">
+            <div class="card-panel col s6">
+                <div class="row">
+                    <div class="col s12">
+                        <div class="input-field inline">
+                            <input id="location" type="text" class="validate" value="{{ item.name }}">
+                            <label for="location">Mesto</label>
+                            <span class="helper-text" data-error="wrong" id="name-message">No changes</span>
+                        </div>
+                    </div>
+                    <div class="col s12">
+                        <div class="input-field inline">
+                            <input id="ptt" type="text" class="validate" value="{{ item.ptt }}">
+                            <label for="ptt">PTT</label>
+                            <span class="helper-text" data-error="wrong" id="ptt-message">Not Valid</span>
+                        </div>
+                    </div>
+                    <div class="col s12">
+                        <button id="edit-loc" class="btn waves-effect waves-light" type="button" name="action">Edit
+                            <i class="material-icons right">send</i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+        $("#edit-loc").click(function () {
+            var data = {
+                id: {{ item.id }},
+                name: '',
+                ptt: ''
+            };
+            var sFunction = function (response) {
+                if(response.code == 400){
+                    $('#name-message').text(response.data.name);
+                    $('#ptt-message').text(response.data.ptt);
+                } else {
+                    window.location.href = "{{path('location_list')}}";
+                }
+            };
+
+            if (validator.empty($("#location").val())){
+                $('#name-message').text('Polje mora biti ispunjeno');
+            } else {
+                $('#name-message').text('Valid');
+                data.name = $("#location").val();
+            }
+
+            if (validator.empty($("#ptt").val())){
+                $('#ptt-message').text('Polje mora biti ispunjeno');
+            } else if (!validator.ptt($("#ptt").val())){
+                $('#ptt-message').text('Polje mora 5 brojeva');
+            } else {
+                $('#ptt-message').text('Valid');
+                data.ptt = parseInt($("#ptt").val());
+            }
+            if (!validator.empty(data.name) && !validator.empty(data.ptt)){
+                adapter.post("{{ path('json_edit_location') }}", data, sFunction);
+            }
+        });
+    </script>
+{% endblock %}

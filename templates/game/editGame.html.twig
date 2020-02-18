@@ -1,0 +1,153 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Game{% endblock %}
+
+{% block body %}
+    <h1>Add Game</h1>
+
+    <div class="row">
+        <div class="card-panel col s6">
+            <div class="row">
+                <div class="input-field col s12">
+                    <select id="domacin">
+                        <option value="{{ game.homeClub.id }}">{{game.homeClub.name}}</option>
+                        {% for club in clubs %}
+                            <option value="{{ club.id }}">{{club.name}}</option>
+                        {% endfor %}
+                    </select>
+                    <label id="domacin-message">Domacin</label>
+                </div>
+                <div class="col s12">
+                    <div class="input-field inline">
+                        <input id="domacinGolovi" type="text" class="validate" value="{{ game.homeGoals }}">
+                        <label for="domacinGolovi">Domacin Golovi</label>
+                        <span class="helper-text" data-error="wrong" id="domacin-golovi-message">No changes</span>
+                    </div>
+                </div>
+                <div class="input-field col s12">
+                    <select id="gost">
+                        <option value="{{ game.guestClub.id }}">{{game.guestClub.name}}</option>
+                        {% for club in clubs %}
+                            <option value="{{ club.id }}">{{club.name}}</option>
+                        {% endfor %}
+                    </select>
+                    <label id="gost-message">Gost</label>
+                </div>
+                <div class="col s12">
+                    <div class="input-field inline">
+                        <input id="gostGolovi" type="text" class="validate" value="{{ game.guestGoals }}">
+                        <label for="gostGolovi">Gost Golovi</label>
+                        <span class="helper-text" data-error="wrong" id="gost-golovi-message">No changes</span>
+                    </div>
+                </div>
+                <div class="input-field col s12">
+                    <select id="liga">
+                        <option value="{{ game.league.id }}">{{ game.league.leagueName }}</option>
+                        {% for league in leagues %}
+                            <option value="{{ league.id }}">{{league.LeagueName}}</option>
+                        {% endfor %}
+                    </select>
+                    <label id="liga-message">Odaberite Ligu</label>
+                </div>
+                <div class="col s12">
+                    <div class="input-field inline">
+                        <input id="date" type="date" class="validate" value="{{ game.gameDate| date('yy-m-d') }}">
+                        <label for="date">Datum odigravanja</label>
+                        <span class="helper-text" data-error="wrong" id="date-message">Not Valid</span>
+                    </div>
+                </div>
+                <div class="col s12">
+                    <button id="edit-game" class="btn waves-effect waves-light" type="button" name="action">Edit
+                        <i class="material-icons right">send</i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+        $("#edit-game").click(function () {
+            var data = {
+                id : {{ game.id }},
+                homeClub: {
+                    id : ''
+                },
+                guestClub: {
+                    id : ''
+                },
+                homeGoals: '',
+                guestGoals: '',
+                league: {
+                    id : ''
+                },
+                gameDate: ''
+            };
+
+            if ($("#domacin").val() !== '0'){
+                if (($("#domacin").val() !== ($("#gost").val()))){
+                    data.homeClub.id = parseInt($('#domacin').val());
+                    $('#domacin-message').text('Valid');
+                } else {
+                    $('#domacin-message').text('Domacin ne moze biti isti kao gost');
+                }
+            } else {
+                $('#domacin-message').text('Morate izabrati domacina');
+            }
+
+            if ($("#gost").val() !== '0'){
+                if (($("#domacin").val() !== ($("#gost").val()))){
+                    data.guestClub.id = parseInt($('#gost').val());
+                    $('#gost-message').text('Valid');
+                } else {
+                    $('#gost-message').text('Gost ne moze biti isti kao domacin');
+                }
+            } else {
+                $('#gost-message').text('Morate izbrati gosta');
+            }
+
+            if (validator.empty($("#domacinGolovi").val())){
+                $('#domacin-golovi-message').text('Polje mora biti ispunjeno');
+            } else if (!validator.goal($("#domacinGolovi").val())){
+                $('#domacin-golovi-message').text('Unesite broj');
+            } else {
+                $('#domacin-golovi-message').text('Valid');
+                data.homeGoals = parseInt($("#domacinGolovi").val());
+            }
+
+            if (validator.empty($("#gostGolovi").val())){
+                $('#gost-golovi-message').text('Polje mora biti ispunjeno');
+            } else if (!validator.goal($("#gostGolovi").val())){
+                $('#gost-golovi-message').text('Unesite broj');
+            } else {
+                $('#gost-golovi-message').text('Valid');
+                data.guestGoals = parseInt($("#gostGolovi").val());
+            }
+
+            if ($("#liga").val() !== '0'){
+                data.league.id = parseInt($("#liga").val());
+            }
+
+            if (validator.empty( $("#date").val())){
+                $('#date-message').text('Izabeirte datum');
+            } else {
+                data.gameDate = $("#date").val();
+            }
+
+            var sFunction = function (response) {
+                if(response.code == 400) console.log("greska");
+                else window.location.href = "{{path('game_list')}}";
+            };
+
+            if (!validator.empty(data.homeClub.id) && !validator.empty(data.homeGoals) && !validator.empty(data.guestClub.id) && !validator.empty(data.guestGoals)
+                && !validator.empty(data.gameDate) && !validator.empty(data.league.id)){
+                adapter.post("{{ path('json_add_game') }}", data, sFunction);
+            }
+        });
+    </script>
+{% endblock %}

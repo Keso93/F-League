@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Location{% endblock %}
+
+{% block body %}
+    <h1>Add Location</h1>
+
+    <div class="row">
+        <div class="card-panel col s6">
+            <div class="row">
+                <div class="col s12">
+                    <div class="input-field inline">
+                        <input id="location" type="text" class="validate">
+                        <label for="location">Mesto</label>
+                        <span class="helper-text" data-error="wrong" id="name-message">Not Valid</span>
+                    </div>
+                </div>
+                <div class="col s12">
+                    <div class="input-field inline">
+                        <input id="ptt" type="text" class="validate">
+                        <label for="ptt">PTT</label>
+                        <span class="helper-text" data-error="wrong" id="ptt-message">Not Valid</span>
+                    </div>
+                </div>
+                <div class="col s12">
+                    <button id="add-loc" class="btn waves-effect waves-light" type="submit" name="action">Submit
+                        <i class="material-icons right">send</i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+        $("#add-loc").click(function () {
+
+            var data = {
+                name: '',
+                ptt: ''
+            };
+
+            if (validator.empty($("#location").val())){
+                $('#name-message').text('Polje mora biti ispunjeno');
+            } else {
+                $('#name-message').text('Valid');
+                data.name = $("#location").val();
+            }
+
+            if (validator.empty($("#ptt").val())){
+                $('#ptt-message').text('Polje mora biti ispunjeno');
+            } else if (!validator.ptt($("#ptt").val())){
+                $('#ptt-message').text('Polje mora 5 brojeva');
+            } else {
+                $('#ptt-message').text('Valid');
+                data.ptt = parseInt($("#ptt").val());
+            }
+
+            var sFunction = function (response) {
+                if(response.code == 400){
+                    $('#name-message').text(response.data.name);
+                    $('#ptt-message').text(response.data.ptt);
+                } else {
+                    window.location.href = "{{path('location_list')}}";
+                }
+            };
+
+            if (!validator.empty(data.name) && !validator.empty(data.ptt)){
+                adapter.post("{{ path('json_add_location') }}", data, sFunction);
+            }
+            console.log(data);
+        });
+    </script>
+{% endblock %}

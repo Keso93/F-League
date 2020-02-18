@@ -1,0 +1,17 @@
+<div class="form">
+    {% if games is defined and games|length %}
+        {% for game in games %}
+            <span class="form-item {{ game.r }} btn tooltipped" data-position="top" data-tooltip="<div>{{ game.game_date | date('d.m.Y') }}</div><div>{{game.home_club ~ " " ~ game.home_goals }} : {{ game.guest_goals ~ " " ~ game.guest_club}}</div>">{{ game.r }}</span>
+        {% endfor %}
+    {% else %}
+        <span>Nema podataka</span>
+    {% endif %}
+</div>
+
+{% block customJavascripts %}
+    <script>
+        $(document).ready(function(){
+            $('.tooltipped').tooltip();
+        });
+    </script>
+{% endblock %}

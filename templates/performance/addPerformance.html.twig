@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Performance{% endblock %}
+
+{% block body %}
+    <h1>Add Performance</h1>
+    <div class="row">
+        <div class="card-panel col s8">
+            <div class="row">
+                <div class="input-field col s11">
+                    <select class="js-example-responsive" id="game">
+                        <option value="0">Odaberite Utakmicu</option>
+                        {% for game in games %}
+                            <option value="{{ game.id }}" data-domacin="{{ game.homeClubId }}" data-gost="{{ game.guestClubId }}">{{ game.homeClub }} vs {{ game.guestClub }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="player-performance-listing"></div>
+    <br>
+    <div class="col s12">
+        <button id="add-performance" class="btn waves-effect waves-light" type="submit" name="action">Submit
+            <i class="material-icons right">send</i>
+        </button>
+    </div>
+
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+
+        $("#add-performance").click(function () {
+
+            var data = [];
+
+            $('.player-rating-row').each(function () {
+                var id = $(this).data('player-id');
+                data.push({
+                    game: {
+                        id: parseInt($("#game").val())
+                    },
+                    player: {
+                        id: parseInt($(this).data('player-id'))
+                    },
+                    playerRating: parseInt($("#rating_" + id).val())
+                });
+            });
+
+            var sFunction = function (response) {
+
+                if(response){
+                    window.location.href = "{{path('performance_list')}}";
+                }
+            };
+            adapter.post("{{ path('json_add_performance') }}", data, sFunction);
+        });
+
+        $("#game").change(function () {
+            var domacin = $(this).find(':selected').data('domacin');
+            var gost = $(this).find(':selected').data('gost');
+            var game = $(this).find(':selected').val();
+
+            var data = {
+                domacin: domacin,
+                gost: gost,
+                game: game
+            };
+            var sFunction = function (response) {
+                    $("#player-performance-listing").html(response.html);
+                };
+
+            adapter.post("{{ path('json_performance_players') }}", data, sFunction);
+        });
+
+
+    </script>
+{% endblock %}

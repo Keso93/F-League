@@ -1,0 +1,17 @@
+<nav>
+    <a href="{{ path('admin') }}" class="brand-logo"><img src="https://fsd.rs/assets/images/fsd-logo-w-opt.svg" alt="logo"></a>
+    <ul class="right hide-on-med-and-down">
+        <li><i class="material-icons">list</i><a href="{{path('ranking')}}">Table</a></li>
+        <li><i class="material-icons">directions_run</i><a href="{{path('game_list')}}">Games</a></li>
+        <li><i class="material-icons">account_circle</i><a href="{{path('player_list')}}">Players</a></li>
+        <li><i class="material-icons">location_city</i><a href="{{path('location_list')}}">Locations</a></li>
+        <li><i class="material-icons">gps_fixed</i><a href="{{path('position_list')}}">Positions</a></li>
+        <li><i class="material-icons">business_center</i><a href="{{path('club_list')}}">Clubs</a></li>
+        <li><i class="material-icons">date_range</i><a href="{{path('league_list')}}">Leagues</a></li>
+        <li><i class="material-icons">timeline</i><a href="{{path('performance_list')}}">Performances</a></li>
+    </ul>
+    <ul class="logout-wrapper">
+        <li class="admin-logout btn waves-effect waves-light red"><i class="material-icons">keyboard_tab</i><a href="{{path('app_logout')}}">Log out</a></li>
+    </ul>
+
+</nav>

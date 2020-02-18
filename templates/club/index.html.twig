@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clubs{% endblock %}
+
+{% block body %}
+    {% if items %}
+        <div class="row">
+            <div class="card-panel col s12">
+                <h3>Klubovi</h3>
+                <table id="club" class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Naziv Kluba</th>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <th>Action</th>
+                        {% endif %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for club in items %}
+                        <tr class="row_{{ club.id }}">
+                            <td>{{ club.name }}</td>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <td>
+                                    <a href="{{ path('edit_club', {id:club.id}) }}" class="btn btn-light">Edit</a>
+                                    <button class="btn waves-effect waves-light red delete_js" type="button" data-id="{{ club.id }}">Delete</button>
+
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <br>
+
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a class="btn-floating btn-large waves-effect waves-light red" href="{{path('addclub')}}"><i class="material-icons">add</i></a>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+            <p>No clubs to display</p>
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{path('addclub')}}" class="nav-link">Dodaj Novi Klub</a>
+            {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+        $(".delete_js").click(function () {
+            var id = $(this).data('id');
+            var data = {
+                id: id,
+                name: $("#club").val(),
+            };
+            var sFunction = function (response) {
+
+                if(response){ // check whether response is received
+                    console.log(response);
+                    if (response.code == 200){
+                        $('.row_' + id).remove();
+                        M.toast({html: 'Successfully deleted!', classes: 'green darken-3'})
+                    }
+                }
+
+            };
+            adapter.delete("{{ path('json_delete_club') }}", data, sFunction);
+        });
+
+        {#$(".pag").click(function () {#}
+        {#    var page = $(this).data('pagination');#}
+        {#    console.log(page);#}
+        {#    console.log("page");#}
+        {#    var data = {#}
+        {#        page: page,#}
+        {#    };#}
+        {#    var sFunction = function (response) {#}
+
+        {#        if(response){ // check whether response is received#}
+        {#            $("#clubs-listing").html("");#}
+        {#            $("#clubs-listing").html(response.html);#}
+        {#        }#}
+
+        {#    };#}
+        {#    adapter.post("{{ path('json_clubs_pag') }}", data, sFunction);#}
+        {#});#}
+    </script>
+{% endblock %}

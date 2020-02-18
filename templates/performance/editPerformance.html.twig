@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Player{% endblock %}
+
+{% block body %}
+<h1>Edit Performance</h1>
+{#    <form action="/player/update/{{ player.id }}" method="post">#}
+{#        Player: <input name="name" type="text" value="{{ player.name }}">#}
+{#        PTT: <input name="ptt" type="text" value="{{ player.ptt }}">#}
+{#        <input type="submit">#}
+{#    </form>#}
+
+
+<table id="players" class="table table-striped">
+    <thead>
+    <tr>
+        <th>Utakmica</th>
+        <th>Igrac</th>
+        <th>Ocjena</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr class="row_{{ performance.id }}">
+            <td>{{ performance.game.homeClub.name }} vs {{ performance.game.guestClub.name }}</td>
+            <td>{{ performance.player.name ~ ' ' ~ performance.player.surname }}</td>
+            <td>
+                <select id="rating">
+                    <option value="0">Nije Igrao</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<br>
+<div class="col s12">
+    <button id="edit-performance" class="btn waves-effect waves-light" type="button" name="action">Edit
+        <i class="material-icons right">send</i>
+    </button>
+</div>
+
+{% endblock %}
+
+{% block customJavascripts %}
+<script>
+    $("#edit-performance").click(function () {
+        var data = {
+            id: {{ performance.id }},
+            playerRating: parseInt($("#rating").val()),
+
+        };
+        console.log(data);
+        var sFunction = function (response) {
+
+            if(response){ // check whether response is received
+                window.location.href = "{{path('performance_list')}}";
+            }
+
+        };
+        adapter.post("{{ path('json_edit_performance') }}", data, sFunction);
+    });
+
+</script>
+{% endblock %}

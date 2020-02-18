@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+{% block customStylesheets %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css">
+{% endblock %}
+{% block title %}Hello Admin!{% endblock %}
+
+{% block body %}
+    <div class="admin-main">
+        <div class="row">
+            <div class="input-field col s12">
+                <select class="js-example-responsive" id="player">
+                    <option value="0">Odaberite Igraca</option>
+                    {% for player in players %}
+                        <option value="{{ player.id }}" data-player="{{ player.id }}">{{ player.name ~ ' ' ~ player.surname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="player-profile-holder">
+            <div id="player-profile" class="col s3"></div>
+            <div id="player-performance-listing" class="col s9"></div>
+        </div>
+        <div class="card-panel col s12 charts-holder">
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block customJavascripts %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+    <script>
+
+        $("#player").change(function () {
+            var player = $(this).find(':selected').data('player');
+
+            var data = {
+                id: player,
+            };
+            var sFunction = function (response) {
+                $("#player-performance-listing").html(response.html);
+                $("#player-profile").html(response.playerHtml);
+                var ctx = 'myChart';
+                var labels = [];
+                $.each(response.graphData, function (k, v) {
+                    labels.push(v.x)
+                });
+
+                var config = {
+                    type: 'line',
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    stepSize: 1,
+                                    suggestedMax: 6
+                                }
+                            }]
+                        }
+                    },
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                backgroundColor: "rgba(183, 44, 31, 0.3)",
+                                borderColor: '#b72c1f',
+                                label: response.playerName,
+                                data: response.graphData
+
+                            }
+
+                        ]
+                    }
+                };
+                var myLineChart = new Chart(ctx,config);
+            };
+
+            adapter.post("{{ path('json_players_performances') }}", data, sFunction);
+        });
+
+        $( document ).ready(function() {
+            var data;
+            var sFunction = function (response) {
+                $("#player-performance-listing").html(response.html);
+                $("#player-profile").html(response.playerHtml);
+                var ctx = 'myChart';
+                var labels = [];
+                $.each(response.graphData, function (k, v) {
+                    labels.push(v.x)
+                });
+
+                var config = {
+                    type: 'line',
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    stepSize: 1,
+                                    suggestedMax: 6
+                                }
+                            }]
+                        }
+                    },
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                backgroundColor: "rgba(183, 44, 31, 0.3)",
+                                borderColor: '#b72c1f',
+                                label: response.playerName,
+                                data: response.graphData
+
+                            }
+
+                        ]
+                    }
+                };
+                var myLineChart = new Chart(ctx,config);
+            };
+
+            adapter.post("{{ path('json_admin_best_player') }}", data, sFunction);
+        });
+
+
+
+    </script>
+{% endblock %}

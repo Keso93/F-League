@@ -1,0 +1,190 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Player{% endblock %}
+
+{% block body %}
+    <h1>Add Player</h1>
+
+    <div class="row">
+        <div class="card-panel col s6">
+            <div class="row">
+                <div class="col s12">
+                    <div class="input-field inline">
+                        <input id="name" type="text" class="validate">
+                        <label for="name">Ime</label>
+                        <span class="helper-text" data-error="wrong" id="name-message">No changes</span>
+                    </div>
+                </div>
+                <div class="col s12">
+                    <div class="input-field inline">
+                        <input id="surname" type="text" class="validate">
+                        <label for="surname">Prezime</label>
+                        <span class="helper-text" data-error="wrong" id="surname-message">No changes</span>
+                    </div>
+                </div>
+                <div class="col s12">
+                    <div class="input-field inline">
+                        <input id="jmbg" type="text" class="validate">
+                        <label for="jmbg">JMBG</label>
+                        <span class="helper-text" data-error="wrong" id="jmbg-message">No changes</span>
+                    </div>
+                </div>
+                <div class="input-field col s12">
+                    <select id="location">
+                        <option value="0">Odaberite Mesto</option>
+                        {% for location in locations %}
+                            <option value="{{ location.id }}">{{location.name}}</option>
+                        {% endfor %}
+                    </select>
+                    <label>Odaberite Mesto</label>
+                </div>
+                <div class="input-field col s12">
+                    <select id="position">
+                        <option value="0">Odaberite Poziciju</option>
+                        {% for position in positions %}
+                            <option value="{{ position }}">{{position}}</option>
+                        {% endfor %}
+                    </select>
+                    <label>Odaberite Poziciju</label>
+                </div>
+                <div class="input-field col s12">
+                    <select id="club">
+                        <option value="0">Odaberite Klub</option>
+                        {% for club in clubs %}
+                            <option value="{{ club.id }}">{{club.name}}</option>
+                        {% endfor %}
+                    </select>
+                    <label>Odaberite Klub</label>
+                </div>
+                <div class="col s12">
+                    <div class="input-field inline">
+                        <input id="bd" type="date" class="validate">
+                        <label for="bd">Datum Rodjenja</label>
+                        <span class="helper-text" data-error="wrong" data-success="Valid">Not Valid</span>
+                    </div>
+                </div>
+                <div class="col s12">
+                    <div class="input-field inline" id="image-upload">
+                        <p>Dodajte sliku</p>
+                        <input id="file" type="file" onchange="previewFile()" class="validate">
+                    </div>
+                </div>
+                <div class="col s12">
+                    <button id="add-player" class="btn waves-effect waves-light" type="button" name="action">Save
+                        <i class="material-icons right">send</i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+        var image64;
+        var name;
+        var username;
+        var usersurname;
+
+        $("#add-player").click(function () {
+            var data = {
+                name: '',
+                surname: '',
+                jmbg: '',
+                position: '',
+                username: username + usersurname,
+                password: username + usersurname,
+                email: username + usersurname + '@gmail.com',
+                roles: ["ROLE_PLAYER"],
+                location: {
+                    id: ''
+                },
+                club: {
+                    id: ''
+                },
+                birthDate: '',
+                image: {
+                    name: name,
+                    base64: image64
+                }
+
+            };
+
+
+
+            if (validator.empty($("#name").val())){
+                $('#name-message').text('Polje mora biti ispunjeno');
+            } else {
+                $('#name-message').text('Valid');
+                data.name = $("#name").val();
+                username = $("#name").val();
+            }
+            if (validator.empty($("#surname").val())){
+                $('#surname-message').text('Polje mora biti ispunjeno');
+            } else {
+                $('#surname-message').text('Valid');
+                data.surname = $("#surname").val();
+                usersurname = $("#surname").val();
+            }
+
+            if ($("#position").val() !== '0'){
+                data.position = $("#position").val();
+            }
+
+            if ($("#location").val() !== '0'){
+                data.location.id = parseInt($("#location").val());
+            }
+
+            if ($("#club").val() !== '0'){
+                data.club.id = parseInt($("#club").val());
+            }
+            if (validator.empty( $("#bd").val())){
+                console.log("izaberite datum");
+            } else {
+                data.birthDate = $("#bd").val();
+            }
+
+
+            if (validator.empty($("#jmbg").val())){
+                $('#jmbg-message').text('Polje mora biti ispunjeno');
+            } else if (!validator.jmbg($("#jmbg").val())){
+                $('#jmbg-message').text('Polje mora imati 13 cifara');
+            } else {
+                $('#jmbg-message').text('Valid');
+                data.jmbg = $("#jmbg").val();
+            }
+
+            var sFunction = function (response) {
+                if(response.code == 400) console.log("greska");
+                else window.location.href = "{{path('player_list')}}";
+            };
+
+
+            if (!validator.empty(data.name) && !validator.empty(data.surname) && !validator.empty(data.jmbg) && !validator.empty(data.location.id)
+                && !validator.empty(data.club.id) && !validator.empty(data.position) && !validator.empty(data.birthDate)){
+                console.log(data);
+                adapter.post("{{ path('json_add_player') }}", data, sFunction);
+            }
+        });
+
+
+
+        function previewFile() {
+            const file = document.querySelector('input[type=file]').files[0];
+            const reader = new FileReader();
+            console.log(reader);
+
+            reader.addEventListener("load", function () {
+
+                image64 = reader.result;
+                name = file.name;
+
+            }, false);
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+
+        }
+    </script>
+{% endblock %}

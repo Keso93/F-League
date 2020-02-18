@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit League{% endblock %}
+
+{% block body %}
+    <h1>Edit League</h1>
+
+    <div class="row">
+        <div class="card-panel col s6">
+            <div class="row">
+                <div class="col s12">
+                    <div class="input-field inline">
+                        <input id="league" type="text" class="validate" value="{{ item.leagueName }}">
+                        <label for="league">Liga</label>
+                        <span class="helper-text" data-error="wrong" data-success="right">No changes</span>
+                    </div>
+                </div>
+                <div class="col s12">
+                    <button id="edit-league" class="btn waves-effect waves-light" type="button" name="action">Edit
+                        <i class="material-icons right">send</i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+        $("#edit-league").click(function () {
+            var data = {
+                id: {{ item.id }},
+                leagueName: $("#league").val()
+            };
+
+            var sFunction = function (response) {
+
+                if(response.code == 400) $('#message').text(response.data.leagueName);
+                else window.location.href = "{{path('league_list')}}";
+            };
+
+            if (validator.empty(data.leagueName)){
+                $('#message').text('Polje mora biti ispunjeno');
+            } else {
+                console.log(data);
+                adapter.post("{{ path('json_edit_league') }}", data, sFunction);
+            }
+        });
+    </script>
+{% endblock %}

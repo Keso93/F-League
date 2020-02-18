@@ -1,0 +1,30 @@
+<table id="players" class="table table-striped">
+    <thead>
+    <tr>
+        <th>Igrac</th>
+        <th>Klub</th>
+        <th>Ocjena</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for player in players %}
+        <tr class="row_{{ player.id }} player-rating-row" data-player-id="{{ player.id }}">
+            <td>{{ player.name ~ ' ' ~ player.surname }}</td>
+            <td>{{ player.club.name }}</td>
+            <td>
+                <select id="rating_{{ player.id }}" data-player-rating="{{ player.id }}">
+                    <option value="0">Nije Igrao</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script>
+    $("#players select").formSelect();
+</script>

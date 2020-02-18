@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}
+            <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+            <link href="{{ asset('assets/css/materialize.min.css') }}" type="text/css" rel="stylesheet" />
+            <link href="{{ asset('assets/css/main.css') }}" type="text/css" rel="stylesheet" />
+            <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+            <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        {% endblock %}
+        {% block customStylesheets %}
+        {% endblock %}
+    </head>
+    <body>
+    {% if is_granted('ROLE_ADMIN') %}
+        <aside class="red darken-4">
+            {% include 'layout/navigation-admin.html.twig' %}
+        </aside>
+        {% else %}
+            {% include 'layout/navigation.html.twig' %}
+    {% endif %}
+            <div id="main" class="{{ is_granted('ROLE_ADMIN') ? 'admin-panel' : ''}}">
+                <div class="container">
+                    {% block body %}{% endblock %}
+                </div>
+            </div>
+        {% block javascripts %}
+            <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+            <script src="{{ asset('assets/js/materialize.min.js') }}"></script>
+            <script src="{{ asset('assets/js/main.js') }}"></script>
+            <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+        {% endblock %}
+        {% block customJavascripts %}
+        {% endblock %}
+    </body>
+</html>

@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Leagues{% endblock %}
+
+{% block body %}
+    {% if items %}
+        <div class="row">
+            <div class="card-panel col s12">
+                <h3>Lige</h3>
+                <table id="league" class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Liga</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for league in items %}
+                        <tr class="row_{{ league.id }}">
+                            <td>{{ league.leagueName }}</td>
+                            <td>
+                                <a href="{{ path('edit_league', {id:league.id}) }}" class="btn btn-light">Edit</a>
+                                <button class="btn waves-effect waves-light red delete_js" type="button" data-id="{{ league.id }}">Delete</button>
+                                {#                        <a href="/league/delete/{{ league.id }}" class="waves-effect waves-light red btn delete-article" data-id="{{ league.id }}">Delete</a>#}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <br>
+                <a class="btn-floating btn-large waves-effect waves-light red" href="{{path('addleague')}}"><i class="material-icons">add</i></a>
+            </div>
+        </div>
+    {% else %}
+        <p>No leagues to display</p>
+        <a class="btn-floating btn-large waves-effect waves-light red" href="{{path('addleague')}}"><i class="material-icons">add</i></a>
+
+    {% endif %}
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+        $(".delete_js").click(function () {
+            var id = $(this).data('id');
+            var data = {
+                id: id,
+                name: $("#league").val(),
+            };
+            var sFunction = function (response) {
+
+                if(response){ // check whether response is received
+                    console.log(response);
+                    if (response.code == 200){
+                        $('.row_' + id).remove();
+                        M.toast({html: 'Successfully deleted!', classes: 'green darken-3'})
+                    }
+                }
+
+            };
+            adapter.delete("{{ path('json_delete_league') }}", data, sFunction);
+        });
+    </script>
+{% endblock %}

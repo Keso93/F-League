@@ -1,0 +1,21 @@
+<div class="navbar-fixed">
+{#    <ul id="dropdown1" class="dropdown-content">#}
+{#        <li><a href="{{ path('player') }}">Add player</a></li>#}
+{#        <li><a href="#!">two</a></li>#}
+{#    </ul>#}
+    <nav>
+        <div class="nav-wrapper red darken-4">
+            <a href="{{ path('ranking') }}" class="brand-logo"><img src="https://fsd.rs/assets/images/fsd-logo-w-opt.svg" alt="logo"></a>
+            <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <ul class="right hide-on-med-and-down nav_l">
+                <li><a href="{{path('game_list')}}">Games</a></li>
+                <li><a href="{{path('player_list')}}">Players</a></li>
+                <li><a href="{{path('location_list')}}">Locations</a></li>
+                <li><a href="{{path('position_list')}}">Positions</a></li>
+                <li><a href="{{path('club_list')}}">Clubs</a></li>
+                <li><a href="{{path('league_list')}}">Leagues</a></li>
+                <li><a href="{{path('performance_list')}}">Performances</a></li>
+            </ul>
+        </div>
+    </nav>
+</div>

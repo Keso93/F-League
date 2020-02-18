@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Locations{% endblock %}
+
+{% block body %}
+    {% if items %}
+        <div class="row">
+            <div class="card-panel col s12">
+                <h3>Gradovi</h3>
+                <table id="location" class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Naziv Lokacije</th>
+                        <th>PTT</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for location in items %}
+                        <tr class="row_{{ location.id }}">
+                            <td>{{ location.name }}</td>
+                            <td>{{ location.ptt }}</td>
+                            <td>
+                                <a href="{{ path('edit_location', {id:location.id}) }}" class="btn btn-light">Edit</a>
+                                <button class="btn waves-effect waves-light red delete_js" type="button" data-id="{{ location.id }}">Delete</button>
+                                {#                            <a id="delete" href="{{ path('json_delete_location', {id:location.id}) }}" class="waves-effect waves-red btn delete-article" data-id="{{ location.id }}">Delete</a>#}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <br>
+                <a class="btn-floating btn-large waves-effect waves-light red" href="{{path('addlocation')}}"><i class="material-icons">add</i></a>
+            </div>
+        </div>
+    {% else %}
+        <p>No locations to display</p>
+        <a href="{{path('addlocation')}}" class="nav-link">Dodaj Novu Lokaciju</a>
+
+    {% endif %}
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+        $(".delete_js").click(function () {
+            var id = $(this).data('id');
+            var data = {
+                id: id,
+                name: $("#location").val(),
+                ptt: $("#ptt").val()
+            };
+            var sFunction = function (response) {
+
+                if(response){ // check whether response is received
+                    console.log(response);
+                    if (response.code == 200){
+                        $('.row_' + id).remove();
+                        M.toast({html: 'Successfully deleted!', classes: 'green darken-3'})
+                    }
+                }
+
+            };
+            adapter.delete("{{ path('json_delete_location') }}", data, sFunction);
+        });
+    </script>
+{% endblock %}

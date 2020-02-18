@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Games{% endblock %}
+
+{% block body %}
+    {% if items %}
+        <div class="row">
+            <div class="card-panel col s12">
+                <h3>Utakmice</h3>
+                <table id="game" class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Domacin</th>
+                        <th>Rezultat</th>
+                        <th>Gost</th>
+                        <th>Liga</th>
+                        <th>Datum</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for game in items %}
+                        <tr class="row_{{ game.id }}">
+                            <td>{{ game.homeClub.name }}</td>
+                            <td>{{ game.homeGoals }}:{{ game.guestGoals }}</td>
+                            <td>{{ game.guestClub.name }}</td>
+                            <td>{{ game.league.leagueName }}</td>
+                            <td>{{ game.gameDate|date('d.m.Y') }}</td>
+                            <td>
+                                <a href="{{ path('edit_game', {id:game.id}) }}" class="btn btn-light">Edit</a>
+                                <button class="btn waves-effect waves-light red delete_js" type="button" data-id="{{ game.id }}">Delete</button>
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <br>
+                <a class="btn-floating btn-large waves-effect waves-light red" href="{{path('addgame')}}"><i class="material-icons">add</i></a>
+            </div>
+        </div>
+
+
+    {% else %}
+        <p>No games to display</p>
+        <a class="btn-floating btn-large waves-effect waves-light red" href="{{path('addgame')}}"><i class="material-icons">add</i></a>
+    {% endif %}
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+        $(".delete_js").click(function () {
+            var id = $(this).data('id');
+            var data = {
+                id: id,
+                name: $("#club").val(),
+            };
+            var sFunction = function (response) {
+
+                if(response){ // check whether response is received
+                    console.log(response);
+                    if (response.code == 200){
+                        $('.row_' + id).remove();
+                        M.toast({html: 'Successfully deleted!', classes: 'green darken-3'})
+                    }
+                }
+
+            };
+            adapter.delete("{{ path('json_delete_game') }}", data, sFunction);
+        });
+    </script>
+{% endblock %}

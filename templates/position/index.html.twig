@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Positions{% endblock %}
+
+{% block body %}
+    {% if items %}
+        <table id="position" class="table table-striped">
+            <thead>
+            <tr>
+                <th>Naziv Position</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for position in items %}
+                <tr class="row_{{ position.id }}">
+                    <td>{{ position.name }}</td>
+                    <td>
+
+                        <a href="/position/edit/{{ position.id }}" class="btn btn-light">Edit</a>
+                        <button class="btn waves-effect waves-light red delete_js" type="button" data-name="{{ position.name }}" data-id="{{ position.id }}">Delete</button>
+                        {#                        <a href="/position/delete/{{ position.id }}" class="waves-effect waves-light red btn delete-article" data-id="{{ position.id }}">Delete</a>#}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <br>
+        <a class="btn-floating btn-large waves-effect waves-light red" href="{{path('addposition')}}"><i class="material-icons">add</i></a>
+
+
+    {% else %}
+        <p>No positions to display</p>
+        <a href="{{path('addposition')}}" class="nav-link">Dodaj Novu Poziciju</a>
+
+    {% endif %}
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+        $(".delete_js").click(function () {
+            var id = $(this).data('id');
+            var name = $(this).data('name');
+            var data = {
+                id: id,
+                name: name,
+            };
+            var sFunction = function (response) {
+
+                if(response){ // check whether response is received
+                    console.log(response);
+                    if (response.code == 200){
+                        $('.row_' + id).remove();
+                    }
+                }
+
+            };
+
+            adapter.delete("{{ path('json_delete_position') }}", data, sFunction);
+        });
+    </script>
+{% endblock %}

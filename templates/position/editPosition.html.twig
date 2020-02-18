@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Position{% endblock %}
+
+{% block body %}
+    <h1>Edit Position</h1>
+    {#    <form action="/position/update/{{ position.id }}" method="post">#}
+    {#        Position: <input name="name" type="text" value="{{ position.name }}">#}
+    {#        PTT: <input name="ptt" type="text" value="{{ position.ptt }}">#}
+    {#        <input type="submit">#}
+    {#    </form>#}
+
+
+    <div class="row">
+        <div class="card-panel col s6">
+            <div class="row">
+                <div class="col s12">
+                    <div class="input-field inline">
+                        <input id="position" type="text" class="validate" value="{{ item.name }}">
+                        <label for="position">Mesto</label>
+                        <span class="helper-text" data-error="wrong" data-success="right">No changes</span>
+                    </div>
+                </div>
+                <div class="col s12">
+                    <button id="edit-pos" class="btn waves-effect waves-light" type="button" name="action">Edit
+                        <i class="material-icons right">send</i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+        $("#edit-pos").click(function () {
+            var data = {
+                id: {{ item.id }},
+                name: $("#position").val(),
+            };
+            var sFunction = function (response) {
+
+                if(response){ // check whether response is received
+                    console.log(response);
+                    window.location.href = "{{path('position_list')}}";
+                }
+
+            };
+            adapter.post("{{ path('json_edit_position') }}", data, sFunction);
+        });
+    </script>
+{% endblock %}

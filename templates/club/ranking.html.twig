@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ranking{% endblock %}
+
+{% block body %}
+    {% if rankings %}
+        <div class="row">
+            <div class="card-panel col s12 rank">
+                <h3>Table</h3>
+                <table id="ranking" class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Club</th>
+                        <th class="tc">Played</th>
+                        <th class="tc">Won</th>
+                        <th class="tc">Drawn</th>
+                        <th class="tc">Lost</th>
+                        <th class="tc">GF</th>
+                        <th class="tc">GA</th>
+                        <th class="tc">GD</th>
+                        <th class="tc">Points</th>
+                        <th class="tc form-hide">Form</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for ranking in rankings %}
+                        <tr>
+                            <td>{{ loop.index }}.</td>
+                            <td class="ranking-name"><img src="{{ asset('assets/images/club.png') }}" alt="" class="logo" data-name="{{ ranking.name }}">{{ ranking.name }}</td>
+                            <td class="tc">{{ ranking.played }}</td>
+                            <td class="tc">{{ ranking.wins }}</td>
+                            <td class="tc">{{ ranking.draws }}</td>
+                            <td class="tc">{{ ranking.loss }}</td>
+                            <td class="tc">{{ ranking.gf }}</td>
+                            <td class="tc">{{ ranking.ga }}</td>
+                            <td class="tc">{% if ranking.gd > 0 %}+{% endif %}{{ ranking.gd }}</td>
+                            <td class="tc points">{{ ranking.points }}</td>
+                            <td class="tc button-holder form-hide"><span class="form_js" type="button" data-id="{{ ranking.id }}"></span></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block customJavascripts %}
+    <script>
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://www.thesportsdb.com/api/v1/json/1/lookup_all_teams.php?id=4328",
+            "method": "GET",
+        };
+        $.ajax(settings).done(function (response) {
+
+            response.teams.forEach(function (item) {
+                $('[data-name="' +item.strTeam +'"]').attr('src', item.strTeamBadge);
+            })
+        });
+
+        $(document).ready(function () {
+            $(".form_js").each(function () {
+                var id = $(this).data('id');
+                var data = {
+                    id: id,
+                };
+                var sFunction =  (response) => {
+
+                    if(response){
+                        $(this).closest('.button-holder').html(response.html);
+                    }
+                };
+                adapter.post("{{ path('json_show_form') }}", data, sFunction);
+            });
+        });
+        {#$(".form_js").click(function () {#}
+        {#    var id = $(this).data('id');#}
+        {#    var data = {#}
+        {#        id: id,#}
+        {#    };#}
+        {#    var sFunction =  (response) => {#}
+
+        {#        if(response){#}
+        {#            $(this).closest('.button-holder').html(response.html);#}
+        {#        }#}
+        {#    };#}
+        {#    adapter.post("{{ path('json_show_form') }}", data, sFunction);#}
+        {#});#}
+    </script>
+{% endblock %}

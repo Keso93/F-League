@@ -1,0 +1,70 @@
+<div class="card-panel">
+    <table id="performances" class="table table-striped">
+        <thead>
+        <tr>
+            <th>Utakmica</th>
+            <th>Igrac</th>
+            <th>Ocjena</th>
+            <th>Datum</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for performance in performances %}
+            <tr class="row_{{ performance.id }}">
+                <td id="pagg" class="{{ performance.player.id }}">{{ performance.game.homeClub.name }} vs {{ performance.game.guestClub.name }}</td>
+                <td>{{ performance.player.name }} {{ performance.player.surname }}</td>
+                <td>{{ performance.playerRating }}</td>
+                <td>{{ performance.game.gameDate| date('d.m.Y') }}</td>
+            </tr>
+        {% endfor %}
+            <tr>
+                <td colspan="3">
+                    {% if maxPages > 1 %}
+                        <ul class="pagination pagination-sm">
+                            {# `«` arrow  #}
+{#                            <li {{ thisPage == 1 ? 'class="disabled"' }}>#}
+{#                                <a href="{{ path('admin', {page: thisPage-1 < 1 ? 1 : thisPage-1}) }}">«</a>#}
+{#                                <a href="{{ path('admin', {page: thisPage-1 < 1 ? 1 : thisPage-1}) }}">«</a>#}
+{#                            </li>#}
+
+                            {# Render each page number #}
+                            {% for i in 1..maxPages %}
+                                <li {{ thisPage == i }}>
+                                    <button type="button" class="pag btn waves-effect waves-light red lighten-2" data-pagination="{{ i }}" value="{{ i }}">{{ i }}</button>
+                                </li>
+                            {% endfor %}
+
+                            {# `»` arrow #}
+{#                            <li {{ thisPage == maxPages ? 'class="disabled"' }}>#}
+{#                                <a href="{{ path('admin', {page: thisPage+1 <= maxPages ? thisPage+1 : thisPage}) }}">»</a>#}
+{#                            </li>#}
+                        </ul>
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% block customJavascripts %}
+    <script>
+        $(".pag").click(function () {
+            var page = $(this).data('pagination');
+            var player = $('#pagg').attr('class');
+            console.log(page);
+            console.log(player);
+            var data = {
+                page: page,
+                id: player
+            };
+            var sFunction = function (response) {
+
+                if(response){ // check whether response is received
+                    $("#player-performance-listing").html(response.html);
+                }
+
+            };
+            adapter.post("{{ path('json_players_performances_pag') }}", data, sFunction);
+        });
+    </script>
+{% endblock %}
